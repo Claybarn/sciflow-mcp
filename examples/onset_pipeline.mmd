@@ -1,0 +1,31 @@
+flowchart LR
+  classDef input fill:#eef,stroke:#669
+  classDef stats fill:#fee,stroke:#a55
+  classDef dataset fill:#efe,stroke:#5a5
+  subgraph per_session["each of 16 sessions"]
+    in_lfp[/"lfp<br/><small>series</small>"/]:::input
+    in_wheel[/"wheel<br/><small>series</small>"/]:::input
+    running["<b>running</b><br/>threshold_intervals<br/><small>threshold=2.0</small>"]
+    bouts["<b>bouts</b><br/>filter_intervals<br/><small>min_duration=1.0</small>"]
+    lfp_hp["<b>lfp_hp</b><br/>butter_filter<br/><small>btype=highpass, cutoff=0.5</small>"]
+    epochs["<b>epochs</b><br/>peri_event_normalize<br/><small>pre=1.0, post=2.0, baseline_start=-1.0, ...</small>"]
+    response["<b>response</b><br/>epoch_average"]
+  end
+  responses["<b>responses</b><br/>stack_sessions<br/><small>sessions=16</small>"]:::dataset
+  condition_mean["<b>condition_mean</b><br/>group_reduce<br/><small>group_by=['condition'], within=['subject'], statistic=mean</small>"]:::dataset
+  condition_sem["<b>condition_sem</b><br/>group_reduce<br/><small>group_by=['condition'], within=['subject'], statistic=sem</small>"]:::dataset
+  binned["<b>binned</b><br/>bin_average<br/><small>factor=25</small>"]
+  permutation["<b>permutation</b><br/>permutation_test<br/><small>condition=condition, strata=subject, reps=5000, ...</small>"]:::stats
+  lme["<b>lme</b><br/>mixed_model<br/><small>formula=value ~ condition + C(day), groups=subject, correction=holm</small>"]:::stats
+  in_wheel -- "series" --> running
+  running -- "intervals" --> bouts
+  in_lfp -- "series" --> lfp_hp
+  lfp_hp -- "series" --> epochs
+  bouts -- "intervals" --> epochs
+  epochs -- "series" --> response
+  response -- "series x16" --> responses
+  responses -- "series" --> condition_mean
+  responses -- "series" --> condition_sem
+  responses -- "series" --> binned
+  binned -- "series" --> permutation
+  binned -- "series" --> lme

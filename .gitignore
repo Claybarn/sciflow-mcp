@@ -1,0 +1,11 @@
+.venv/
+__pycache__/
+*.pyc
+.sciflow/
+.pytest_cache/
+dist/
+examples/demo_data/
+examples/.sciflow/
+examples/*.mat
+examples/dataset_data/
+examples/*.csv

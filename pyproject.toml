@@ -1,0 +1,43 @@
+[build-system]
+requires = ["hatchling>=1.25"]
+build-backend = "hatchling.build"
+
+[project]
+name = "sciflow-mcp"
+version = "0.1.0"
+description = "MCP server for building reproducible, interoperable scientific workflows on timestamped data."
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "MIT" }
+authors = [{ name = "Clayton Barnes", email = "clayton@memazing.com" }]
+dependencies = [
+    "numpy>=1.26",
+    "scipy>=1.11",
+    "pydantic>=2.6",
+    "pyyaml>=6",
+    "eventlogic>=0.2",
+    "mcp>=2.3",
+    # Claybarn/permute fork: multi-test stratified permutation tests (Claybarn/permute#1 NaN fix).
+    "permute @ git+https://github.com/Claybarn/permute@1fb21186288ec388439dcce4fdd55c04f522fbd0",
+    "statsmodels>=0.15",
+]
+
+[project.scripts]
+sciflow = "sciflow.cli:main"
+sciflow-mcp = "sciflow.server:main"
+
+[dependency-groups]
+dev = ["pytest>=8"]
+
+[tool.hatch.metadata]
+allow-direct-references = true
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/sciflow"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+# To develop against a local EventLogic checkout, uncomment:
+# [tool.uv.sources]
+# eventlogic = { path = "../EventLogic", editable = true }

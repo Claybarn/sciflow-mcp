@@ -1,0 +1,48 @@
+# Running-onset LFP response in every session, averaged per subject, then per condition.
+# `dataset` is filled in by examples/dataset_demo.py after registering the manifest.
+name: running-onset-lfp-by-condition
+dataset: REPLACE
+session_steps:
+  - id: running
+    op: threshold_intervals
+    inputs: {series: inputs.wheel}
+    params: {threshold: 2.0}
+  - id: bouts
+    op: filter_intervals
+    inputs: {a: steps.running}
+    params: {min_duration: 1.0}
+  - id: lfp_hp
+    op: butter_filter
+    inputs: {series: inputs.lfp}
+    params: {btype: highpass, cutoff: 0.5}
+  - id: epochs
+    op: peri_event_normalize
+    inputs: {series: steps.lfp_hp, events: steps.bouts}
+    params: {pre: 1.0, post: 2.0, baseline_start: -1.0, baseline_stop: 0.0, method: zscore}
+  - id: response
+    op: epoch_average
+    inputs: {epochs: steps.epochs}
+collect:
+  responses: response
+aggregate_steps:
+  - id: condition_mean
+    op: group_reduce
+    inputs: {series: inputs.responses}
+    params: {group_by: [condition], within: [subject], statistic: mean}
+  - id: condition_sem
+    op: group_reduce
+    inputs: {series: inputs.responses}
+    params: {group_by: [condition], within: [subject], statistic: sem}
+  # Statistics on every session (not just subject means), respecting that sessions are nested in subjects.
+  - id: binned
+    op: bin_average
+    inputs: {series: inputs.responses}
+    params: {factor: 25}                      # 100 ms bins: 30 lags x 4 channels = 120 tests
+  - id: permutation
+    op: permutation_test
+    inputs: {series: steps.binned}
+    params: {condition: condition, strata: subject, reps: 5000, seed: 0, correction: max}
+  - id: lme
+    op: mixed_model
+    inputs: {series: steps.binned}
+    params: {formula: "value ~ condition + C(day)", groups: subject, correction: holm}

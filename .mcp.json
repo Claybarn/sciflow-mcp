@@ -1,0 +1,9 @@
+{
+  "mcpServers": {
+    "sciflow": {
+      "command": "uv",
+      "args": ["run", "sciflow-mcp"],
+      "env": { "SCIFLOW_STORE": ".sciflow" }
+    }
+  }
+}
