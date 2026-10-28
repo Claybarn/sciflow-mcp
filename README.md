@@ -11,10 +11,18 @@ It builds on three earlier pieces of work:
 ## Install
 
 ```bash
+pip install sciflow-mcp
+```
+
+To run the MCP server without installing anything, use `uvx sciflow-mcp`, for example in a client config: `{"command": "uvx", "args": ["sciflow-mcp"], "env": {"SCIFLOW_STORE": "/path/to/store"}}`.
+
+For development, clone the repo:
+
+```bash
 git clone https://github.com/Claybarn/sciflow-mcp && cd sciflow-mcp && uv sync
 ```
 
-Opening the repo in Claude Code picks up the server from [.mcp.json](.mcp.json). For other MCP clients, see [MCP tools](#mcp-tools).
+Opening the clone in Claude Code picks up the server from [.mcp.json](.mcp.json).
 
 ## Why it interoperates
 
