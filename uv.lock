@@ -717,15 +717,19 @@ wheels = [
 ]
 
 [[package]]
-name = "permute"
-version = "0.3rc1.dev0"
-source = { git = "https://github.com/Claybarn/permute?rev=1fb21186288ec388439dcce4fdd55c04f522fbd0#1fb21186288ec388439dcce4fdd55c04f522fbd0" }
+name = "permute-multitest"
+version = "0.3.0"
+source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "cryptorandom" },
     { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.12'" },
     { name = "numpy", version = "2.5.4", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.12'" },
     { name = "scipy", version = "1.17.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.12'" },
     { name = "scipy", version = "1.18.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.12'" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/1e/05/d098a7b3bbd821d4b4ed6f883520e7e25dc61561246ce1268beac722ea02/permute_multitest-0.3.0.tar.gz", hash = "sha256:d255ad35a186a11c348147e61cb7de0607487a2a3bf36613e9737788e30f6156", size = 157130, upload-time = "2026-10-28T22:00:20.096Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/18/72/27edc0f6d38e86c42ca85bc3ef39b8235e216d8992c98efe10e2ec36ea93/permute_multitest-0.3.0-py3-none-any.whl", hash = "sha256:cab37b296d27e9b108f584e2e47603943e513184bf4e98d7420d2a55e9c88c04", size = 168172, upload-time = "2026-10-28T22:00:18.56Z" },
 ]
 
 [[package]]
@@ -1190,7 +1194,7 @@ dependencies = [
     { name = "mcp" },
     { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.12'" },
     { name = "numpy", version = "2.5.4", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.12'" },
-    { name = "permute" },
+    { name = "permute-multitest" },
     { name = "pydantic" },
     { name = "pyyaml" },
     { name = "scipy", version = "1.17.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.12'" },
@@ -1208,7 +1212,7 @@ requires-dist = [
     { name = "eventlogic", specifier = ">=0.2" },
     { name = "mcp", specifier = ">=2.3" },
     { name = "numpy", specifier = ">=1.26" },
-    { name = "permute", git = "https://github.com/Claybarn/permute?rev=1fb21186288ec388439dcce4fdd55c04f522fbd0" },
+    { name = "permute-multitest", specifier = ">=0.3.0" },
     { name = "pydantic", specifier = ">=2.6" },
     { name = "pyyaml", specifier = ">=6" },
     { name = "scipy", specifier = ">=1.11" },
