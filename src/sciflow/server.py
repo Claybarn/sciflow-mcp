@@ -20,7 +20,7 @@ from typing import Any, Literal
 
 from mcp.server.mcpserver import MCPServer
 
-from . import exporters, io, viz
+from . import compare as _compare, exporters, io, viz
 from .dataset import is_pipeline, load_any, register_dataset as _register_dataset, run_any
 from .registry import REGISTRY, get_op
 from .store import Store
@@ -158,6 +158,17 @@ def get_dataset(dataset_id: str | None = None) -> dict[str, Any] | list[dict[str
     """A registered dataset's sessions, subjects, attributes and input artifact ids. With no id, lists datasets."""
     try:
         return store().get_dataset(dataset_id) if dataset_id else store().list_datasets()
+    except Exception as e:
+        return _error(e)
+
+
+@mcp.tool()
+def compare_artifacts(a: str, b: str, rtol: float = 1e-9, atol: float = 0.0) -> dict[str, Any]:
+    """Check whether two artifacts agree numerically, e.g. the same step run on a laptop and on a cluster.
+    Ids are hashes of exact bytes, so different hardware can give different ids for results that agree to
+    ~1e-15; this compares kind, axes, stamps, coordinates and data within |a - b| <= atol + rtol * |b|."""
+    try:
+        return {"ok": True, **_compare.compare(store().get(a), store().get(b), rtol=rtol, atol=atol)}
     except Exception as e:
         return _error(e)
 

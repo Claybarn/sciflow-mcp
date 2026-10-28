@@ -95,7 +95,9 @@ def _yaml_or_dict(source) -> dict:
     if isinstance(source, dict):
         return source
     text = str(source)
-    if isinstance(source, Path) or ("\n" not in text and Path(text).is_file()):
+    if isinstance(source, Path) or ("\n" not in text and Path(text).suffix.lower() in (".json", ".yaml", ".yml")):
+        if not Path(text).is_file():
+            raise FileNotFoundError(f"file {text!r} not found")
         text = Path(source).read_text()
     return yaml.safe_load(text)
 

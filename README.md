@@ -33,7 +33,9 @@ There are exactly two artifact kinds. Both lie on a named **parametric axis** wi
 
 ## Why it's reproducible
 
-- **Content-addressed artifacts.** An artifact's id is the SHA-256 of its arrays and header. The same data gets the same id on any machine.
+- **Content-addressed artifacts.** An artifact's id is the SHA-256 of its arrays and header, so identical bytes always get identical ids.
+  - **Same platform and image:** results are bit-identical, so cache hits and ids carry over. This holds for a local Docker run and the same image on Slurm or Kubernetes.
+  - **Different hardware or OS:** floating-point operations can differ in the last bits. A Butterworth filter computed on macOS and in the Linux image differs by up to ~7e-15 relative, which changes its id. `compare_artifacts` checks that two results agree within a tolerance, and every run records Python, platform and package versions.
 - **Deterministic step keys.** Each step's cache key is `hash(op, op version, validated params, input ids)`. Re-running reuses results, and changing one parameter re-runs only that step and the steps downstream of it.
 - **Provenance records.** Every run writes `runs/<run_id>.json`. It holds the resolved workflow, Python/package/operation versions, and each step's params, inputs, output, cache key and timing. Each output artifact also records the step that made it.
 
@@ -128,6 +130,7 @@ Results stay on the parametric axis (`lag`), so p-values can be restricted to a 
 | `import_data` | `.npy` / `.npz` / `.mat` (incl. Collate structs) / `.csv` into the store; `ticks_per_unit` converts sample numbers |
 | `list_artifacts`, `inspect_artifact` | parametric axis and unit, shape, axes, extent, sample rate, NaN fraction, provenance |
 | `validate_workflow` | static check of a workflow or pipeline: references, cycles, kinds, params |
+| `compare_artifacts` | check two results agree within a tolerance, e.g. a laptop run vs a cluster run |
 | `visualize_workflow` | Mermaid flowchart or node/edge graph of a workflow or pipeline |
 | `run_workflow`, `get_run` | execute a workflow or pipeline locally and read the provenance record |
 | `export_workflow` | compile to Slurm (`sbatch` chain) or Argo Workflows (Kubernetes) |
@@ -144,7 +147,7 @@ This repo's [.mcp.json](.mcp.json) registers the server for Claude Code, with th
 Both exporters run each step as `sciflow run-step <workflow.json> <step> --store <store>` against a shared store. Results pass between jobs through the content-addressed cache, so a cluster run and a local run produce identical artifact ids.
 
 - **Slurm:** `export_workflow(target="slurm")` writes one `.sbatch` per step and a `submit.sh` that chains them with `--dependency=afterok`. The store must be on a shared filesystem.
-- **Kubernetes:** `export_workflow(target="argo")` writes a ConfigMap (the workflow) plus an Argo `Workflow` DAG. The store is a ReadWriteMany PVC mounted at `/store`. Build the step image with the included `Dockerfile`.
+- **Kubernetes:** `export_workflow(target="argo")` writes a ConfigMap (the workflow) plus an Argo `Workflow` DAG. The store is a ReadWriteMany PVC mounted at `/store`. Build the step image with the included `Dockerfile`. It installs exactly the versions in `uv.lock`.
 
 ## Development
 

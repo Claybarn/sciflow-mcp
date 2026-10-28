@@ -233,3 +233,15 @@ def test_datetime_timestamps():
     exdiv = IntervalSet.from_times(np.array(["2024-01-15", "2024-02-15"], dtype="datetime64[D]"))
     ep = call("peri_event", {"series": price, "events": exdiv}, pre=3 * 86400, post=5 * 86400)
     np.testing.assert_array_equal(ep.data[:, 3], [14, 45])  # the value on each ex-dividend day
+
+
+def test_compare_artifacts_tolerance():
+    from sciflow.compare import compare
+
+    a = Series(np.arange(5.0), np.linspace(1, 2, 5))
+    b = a.replace(data=a.data * (1 + 1e-14))
+    assert not np.array_equal(a.data, b.data)
+    assert compare(a, b)["match"]
+    assert not compare(a, b, rtol=1e-16)["match"]
+    assert not compare(a, a.replace(axes=("depth",)))["match"]
+    assert compare(IntervalSet([0], [1]), IntervalSet([0], [1]))["match"]

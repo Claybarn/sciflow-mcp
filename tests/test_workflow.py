@@ -165,3 +165,8 @@ def test_csv_with_dates(tmp_path):
     (tmp_path / "ev.csv").write_text("date\n2024-01-03\n")
     ev = io.import_file(tmp_path / "ev.csv", kind="intervals", times_key="date")
     assert ev.ons[0] == ts.stamps[1]
+
+
+def test_missing_workflow_file_is_reported(tmp_path):
+    with pytest.raises(FileNotFoundError, match="not found"):
+        load_spec(str(tmp_path / "nope.json"))

@@ -84,7 +84,9 @@ def load_spec(source: str | Path | dict | WorkflowSpec) -> WorkflowSpec:
     if isinstance(source, dict):
         return WorkflowSpec.model_validate(source)
     text = str(source)
-    if isinstance(source, Path) or ("\n" not in text and Path(text).is_file()):
+    if isinstance(source, Path) or ("\n" not in text and Path(text).suffix.lower() in (".json", ".yaml", ".yml")):
+        if not Path(text).is_file():
+            raise FileNotFoundError(f"workflow file {text!r} not found")
         text = Path(source).read_text()
     return WorkflowSpec.model_validate(yaml.safe_load(text))
 
